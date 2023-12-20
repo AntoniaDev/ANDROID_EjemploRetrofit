@@ -6,17 +6,27 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import antonia.alarcon.android_ejemploretrofit.PhotoActivity;
 import antonia.alarcon.android_ejemploretrofit.R;
+import antonia.alarcon.android_ejemploretrofit.conexiones.ApiConexiones;
+import antonia.alarcon.android_ejemploretrofit.conexiones.RetrofitObject;
 import antonia.alarcon.android_ejemploretrofit.constantes.Constantes;
 import antonia.alarcon.android_ejemploretrofit.modelos.Album;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumVH> {
     private Context context;
@@ -51,6 +61,33 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumVH> {
                 context.startActivity(intent);
             }
         });
+
+        holder.imgDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Retrofit retrofit = RetrofitObject.getConexioin();
+                ApiConexiones api = retrofit.create(ApiConexiones.class);
+
+                Call<Album> deleteAlbum = api.deleteAlbum(a.getId());
+
+                deleteAlbum.enqueue(new Callback<Album>() {
+                    @Override
+                    public void onResponse(Call<Album> call, Response<Album> response) {
+                        if (response.code() == HttpsURLConnection.HTTP_OK) {
+                            objects.remove(a);
+                            notifyItemRemoved(holder.getAdapterPosition());
+                        } else {
+                            Toast.makeText(context, response.message(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Album> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -60,11 +97,13 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumVH> {
 
     public class AlbumVH extends RecyclerView.ViewHolder{
         TextView lbTitulo;
+        ImageButton imgDelete;
 
         public AlbumVH(@NonNull View itemView) {
             super(itemView);
 
             lbTitulo = itemView.findViewById(R.id.lbTituloViewHolder);
+            imgDelete = itemView.findViewById(R.id.imgDeleteAlbumViewHolder);
         }
     }
 

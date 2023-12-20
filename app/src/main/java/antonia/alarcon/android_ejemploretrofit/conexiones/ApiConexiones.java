@@ -6,6 +6,7 @@ import antonia.alarcon.android_ejemploretrofit.modelos.Album;
 import antonia.alarcon.android_ejemploretrofit.modelos.Photo;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -29,4 +30,9 @@ public interface ApiConexiones {
     //INSERTAR UN ALBUM
     @POST("/albums")
     Call<Album> postAlbum(@Body Album a);
+
+    //BORRAR UN ALBUM
+    //llaves porque no le voy a poner un parámetro
+    @DELETE("/albums/{id}")
+    Call<Album> deleteAlbum(@Path("id") int idAlbum);
 }
